@@ -61,6 +61,9 @@ services:
 
 volumes:
   mongo-data:
+
+networks:
+  app:
   server:
     external:
       name: server
