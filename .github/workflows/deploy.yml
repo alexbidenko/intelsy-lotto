@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  IMAGE_PROJECT: ${{ env.GITHUB_REGISTRY }}/${{ github.repository }}
+  IMAGE_PROJECT: ghcr.io/${{ github.repository }}
 
 jobs:
   build-client:
