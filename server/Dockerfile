@@ -1,21 +1,21 @@
-FROM oven/bun:1 as build
+FROM oven/bun:1-alpine AS build
 
 WORKDIR /app
 
 COPY package.json bun.lockb ./
-RUN bun install
+RUN bun install --frozen-lockfile
 
 COPY --chown=bun:bun . .
-RUN bun build
+RUN bun run build
 
-FROM oven/bun:1 as dependencies
+FROM oven/bun:1-alpine AS dependencies
 
 WORKDIR /app
 
 COPY package.json bun.lockb ./
-RUN bun install --production
+RUN bun install --frozen-lockfile --production
 
-FROM oven/bun:1
+FROM oven/bun:1-alpine
 
 RUN apk add --no-cache tzdata
 ENV TZ=Europe/Moscow

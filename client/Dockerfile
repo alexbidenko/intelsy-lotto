@@ -1,4 +1,4 @@
-FROM oven/bun:1 AS dependencies
+FROM oven/bun:1-alpine AS dependencies
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY package.json bun.lockb ./
 
 RUN bun install --frozen-lockfile
 
-FROM oven/bun:1 AS build
+FROM oven/bun:1-alpine AS build
 
 ARG BITRIX_CLIENT_ID
 ARG BASIC_AUTH_PASSWORD
@@ -19,9 +19,9 @@ WORKDIR /app
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
 
-RUN pnpm build
+RUN bun run build
 
-FROM oven/bun:1 AS deploy
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
