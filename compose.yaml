@@ -51,6 +51,9 @@ services:
       - "27017:27017"
     volumes:
       - "mongo-data:/data/db"
+    networks:
+      - app
+      - bridge
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -58,3 +61,9 @@ services:
 
 volumes:
   mongo-data:
+  server:
+    external:
+      name: server
+  bridge:
+    external:
+      name: bridge
