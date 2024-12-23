@@ -4,9 +4,9 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
+    "start": "nest start -b swc --type-check",
+    "start:dev": "nest start -b swc --type-check --watch",
+    "start:debug": "nest start -b swc --type-check --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix"
   },

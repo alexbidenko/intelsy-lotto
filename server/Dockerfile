@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
 
-COPY --chown=bun:bun . .
+COPY . .
 RUN bun run build
 
 FROM oven/bun:1-alpine AS dependencies
