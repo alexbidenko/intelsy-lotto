@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json bun.lockb ./
 
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 FROM oven/bun:1 AS build
 

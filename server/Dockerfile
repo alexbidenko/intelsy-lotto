@@ -12,8 +12,8 @@ FROM oven/bun:1 as dependencies
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --production
+COPY package.json bun.lockb ./
+RUN bun install --production
 
 FROM oven/bun:1
 
