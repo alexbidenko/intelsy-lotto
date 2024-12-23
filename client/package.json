@@ -19,6 +19,7 @@
     "nuxt": "^3.14.1592",
     "nuxt-security": "^2.1.5",
     "nuxt-strict-fetch": "^0.7.2",
+    "ofetch": "^1.4.1",
     "primevue": "^4.2.5",
     "socket.io-client": "^4.8.1",
     "swiper": "^11.1.15",
