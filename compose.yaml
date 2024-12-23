@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: ${IMAGE_PROJECT}/nginx:latest
+    expose:
+      - 3000
+    networks:
+      - app
+      - server
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+
+  client:
+    image: ${IMAGE_PROJECT}/client:latest
+    networks:
+      - app
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+
+  server:
+    image: ${IMAGE_PROJECT}/server:latest
+    networks:
+      - app
+    environment:
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      BITRIX_CLIENT_ID: ${BITRIX_CLIENT_ID}
+      BITRIX_CLIENT_SECRET: ${BITRIX_CLIENT_SECRET}
+      BITRIX_HOOK_KEY: ${BITRIX_HOOK_KEY}
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongo-data:/data/db"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: game
+
+volumes:
+  mongo-data:

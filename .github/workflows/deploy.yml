@@ -1,0 +1,133 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  IMAGE_PROJECT: ${{ env.GITHUB_REGISTRY }}/${{ github.repository }}
+
+jobs:
+  build-client:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push client
+        uses: docker/build-push-action@v5
+        with:
+          context: client
+          build-args: |
+            BITRIX_CLIENT_ID=${{ secrets.BITRIX_CLIENT_ID }}
+            BASIC_AUTH_PASSWORD=${{ secrets.BASIC_AUTH_PASSWORD }}
+          push: true
+          tags: ${{ env.IMAGE_PROJECT }}/client:latest
+
+  build-server:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push server
+        uses: docker/build-push-action@v5
+        with:
+          context: server
+          push: true
+          tags: ${{ env.IMAGE_PROJECT }}/server:latest
+
+  build-nginx:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'nginx/**'
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - if: steps.changes.outputs.src == 'true'
+        name: Build and push nginx
+        uses: docker/build-push-action@v5
+        with:
+          context: nginx
+          dockerfile: prod.nginx.conf
+          push: true
+          tags: ${{ env.IMAGE_PROJECT }}/nginx:latest
+
+  deploy:
+    runs-on: ubuntu-22.04
+
+    needs: [build-client, build-server, build-nginx]
+
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          ssh-keyscan -t rsa ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+
+      - name: Deploy 🚀
+        run: |
+          env MONGO_PASSWORD="${{ secrets.MONGO_PASSWORD }}" \
+          env BITRIX_CLIENT_ID="${{ secrets.BITRIX_CLIENT_ID }}" \
+          env BITRIX_CLIENT_SECRET="${{ secrets.BITRIX_CLIENT_SECRET }}" \
+          env BITRIX_HOOK_KEY="${{ secrets.BITRIX_HOOK_KEY }}" \
+          env IMAGE_PROJECT="${{ env.IMAGE_PROJECT }}" \
+            docker stack deploy --prune --with-registry-auth -c docker-compose.yml intelsy-lotto
+        env:
+          DOCKER_HOST: ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
