@@ -30,6 +30,9 @@ export default defineNuxtConfig({
       },
     },
   },
+  nitro: {
+    preset: 'bun',
+  },
   alias: {
     '#types': './utils/types.d.ts',
   },
