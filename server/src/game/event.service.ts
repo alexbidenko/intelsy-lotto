@@ -8,6 +8,8 @@ import { Board } from '../schemas/board.schema';
 import { Value } from '../schemas/value.schema';
 import { Choice } from '../schemas/choice.schema';
 
+const EVENT_TYPES = ['first_row', 'second_row', 'third_row', 'full_card'];
+
 @Injectable()
 export class EventService {
   events = new Subject<Event>();
@@ -39,6 +41,21 @@ export class EventService {
   }
 
   async checkFastestUser() {
+    const events = await this.eventModel
+      .find()
+      .sort({ timestamp: 'asc' })
+      .exec();
+    const excludedUsers = new Map<string, number>();
+    events.forEach((event) => {
+      if (
+        EVENT_TYPES.includes(event.name) &&
+        event.data.completed &&
+        !excludedUsers.has(event.name)
+      ) {
+        excludedUsers.set(event.name, event.data.user.id);
+      }
+    });
+
     const pipeline: PipelineStage[] = [
       {
         $lookup: {
@@ -50,6 +67,11 @@ export class EventService {
       },
       { $match: { 'user.0': { $exists: true } } },
       { $unwind: '$user' },
+      {
+        $match: {
+          userId: { $nin: [...excludedUsers.values()] },
+        },
+      },
       {
         $lookup: {
           from: 'values',

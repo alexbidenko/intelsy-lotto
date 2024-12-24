@@ -4,13 +4,6 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import {Mousewheel} from "swiper/modules";
 import 'swiper/css';
 
-const RESULT_MAP: Record<string, string> = {
-  first_row: 'первую строку',
-  second_row: 'вторую строку',
-  third_row: 'третью строку',
-  full_card: 'всю карточку',
-};
-
 const toast = useToast();
 const confirm = useConfirm();
 const gameStore = useGameStore();
@@ -110,6 +103,30 @@ onMounted(() => {
 
     <Divider class="before:!border-surface-700" />
 
+    <h2 class="text-2xl font-bold my-0">Победители</h2>
+    <Swiper
+      slides-per-view="auto"
+      :modules="[Mousewheel]"
+      mousewheel
+      class="w-full"
+    >
+      <template v-if="adminStore.winners.length">
+        <SwiperSlide
+          v-for="(item, index) in adminStore.winners"
+          :key="item._id"
+          :class="{ 'mr-3': index !== adminStore.winners.length - 1 }"
+        >
+
+          <EventCard :data="item" />
+        </SwiperSlide>
+      </template>
+      <SwiperSlide v-else class="!h-32 !w-64 border rounded-lg !flex items-center justify-center">
+        <span class="opacity-50 text-sm">Список победителей пустой</span>
+      </SwiperSlide>
+    </Swiper>
+
+    <Divider class="before:!border-surface-700" />
+
     <h2 class="text-2xl font-bold my-0">Игровые события</h2>
     <Swiper
       slides-per-view="auto"
@@ -120,38 +137,14 @@ onMounted(() => {
       <template v-if="adminStore.events.length">
         <SwiperSlide
           v-for="(item, index) in adminStore.events"
-          class="!h-36 !w-64 border rounded-2xl !flex flex-col p-2 text-sm"
-          :class="{
-            'mr-3': index !== adminStore.events.length - 1,
-            'bg-green-200': item.name === 'faster_user',
-            'bg-purple-200': (item.name !== 'faster_user' && item.name !== 'fastest_user') && !item.data.completed,
-            'bg-yellow-400': item.name === 'fastest_user' || (item.name !== 'faster_user' && item.data.completed),
-          }"
+          :key="item._id"
+          class="!w-fit"
+          :class="{ 'mr-3': index !== adminStore.events.length - 1 }"
         >
-          <div class="flex items-center gap-2 mb-auto">
-            <Avatar :image="item.data.user.avatar" size="large" shape="circle" />
-            <div class="flex flex-col">
-              <span class="font-semibold text-ellipsis overflow-hidden">{{ item.data.user.firstName }} {{ item.data.user.lastName }}</span>
-              <span class="opacity-60 text-ellipsis overflow-hidden">{{ item.data.user.email }}</span>
-            </div>
-          </div>
-          <Divider class="before:!border-surface-400 !mb-2" />
-          <span v-if="item.name === 'faster_user' || item.name === 'fastest_user'" class="block pb-1">
-            {{ item.name === 'faster_user' ? 'Самый быстрый ответ' : 'Самая быстрая реакция в игре' }}
-            <br />
-            Всего за {{ (item.data.duration / 1000).toFixed(2) }}c
-          </span>
-          <template v-else>
-            <span v-if="!item.data.completed" class="block pb-1">
-              Почти заполнил {{ RESULT_MAP[item.name] }}
-            </span>
-              <span v-else class="block pb-1">
-              Заполнил {{ RESULT_MAP[item.name] }}!!!
-            </span>
-          </template>
+          <EventCard :data="item" />
         </SwiperSlide>
       </template>
-      <SwiperSlide v-else class="!h-36 !w-64 border rounded-lg !flex items-center justify-center">
+      <SwiperSlide v-else class="!h-32 !w-64 border rounded-lg !flex items-center justify-center">
         <span class="opacity-50 text-sm">Список событий пустой</span>
       </SwiperSlide>
     </Swiper>
@@ -167,7 +160,7 @@ onMounted(() => {
     <Divider class="before:!border-surface-700" />
 
     <h2 class="text-2xl font-bold my-0">Участники онлайн</h2>
-    <div v-if="adminStore.members.size" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div v-if="adminStore.members.size" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4">
       <button
         v-for="[id, user] in adminStore.members"
         :key="id"

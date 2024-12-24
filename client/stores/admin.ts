@@ -1,5 +1,7 @@
 import type {UserType, EventType} from "#types";
 
+const EVENT_TYPES = ['first_row', 'second_row', 'third_row', 'full_card'];
+
 export const useAdminStore = defineStore('admin', () => {
   const ws = useWsStore();
 
@@ -7,6 +9,20 @@ export const useAdminStore = defineStore('admin', () => {
 
   const members = reactive(new Map<number, UserType>());
   const events = ref<EventType[]>([]);
+
+  const winners = computed(() => [
+    ...events.value.reduceRight((acc, el) => {
+      if (
+        (
+          (EVENT_TYPES.includes(el.name) && el.data.completed) ||
+          el.name === 'fastest_user'
+        ) &&
+        !acc.has(el.name)
+      ) acc.set(el.name, el);
+
+      return acc;
+    }, new Map<string, EventType>()).values(),
+  ]);
 
   const loadMembers = () => {
     AdminAPI.members().then((data) => {
@@ -36,6 +52,7 @@ export const useAdminStore = defineStore('admin', () => {
   return {
     members,
     events,
+    winners,
 
     updateState,
     sendValue,

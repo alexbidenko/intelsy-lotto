@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as ISchema } from 'mongoose';
+import { User } from './user.schema';
 
 export type EventDocument = HydratedDocument<Event>;
 
@@ -9,7 +10,7 @@ export class Event {
   name: string;
 
   @Prop({ required: true, type: ISchema.Types.Mixed })
-  data: object;
+  data: { user: User } & Record<string, any>;
 
   @Prop({ required: true })
   timestamp: number;

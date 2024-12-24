@@ -9,6 +9,7 @@ import { AdminService } from './admin.service';
 import { OnModuleInit } from '@nestjs/common';
 import { GameService } from '../game/game.service';
 import { EventService } from '../game/event.service';
+import { MemberService } from '../game/member.service';
 
 @WebSocketGateway({ namespace: '/admin' })
 export class AdminGateway implements OnModuleInit {
@@ -19,10 +20,11 @@ export class AdminGateway implements OnModuleInit {
     private readonly adminService: AdminService,
     private readonly gameService: GameService,
     private readonly eventService: EventService,
+    private readonly memberService: MemberService,
   ) {}
 
   onModuleInit() {
-    this.gameService.memberSubject.subscribe((value) => {
+    this.memberService.memberSubject.subscribe((value) => {
       this.server.emit('member', { value });
     });
 

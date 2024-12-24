@@ -11,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { fastifyCookie } from '@fastify/cookie';
+import { MemberService } from './member.service';
 
 @WebSocketGateway({ namespace: '/user' })
 export class GameGateway
@@ -19,9 +20,12 @@ export class GameGateway
   @WebSocketServer()
   server: Server;
 
+  users: { socketId: string; data: User }[] = [];
+
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private readonly gameService: GameService,
+    private readonly memberService: MemberService,
   ) {}
 
   onModuleInit() {
@@ -48,25 +52,10 @@ export class GameGateway
       return;
     }
 
-    this.gameService.memberSubject.next({
-      event: 'connected',
-      user,
-    });
+    this.memberService.addMember({ user, socketId: socket.id });
   }
 
   async handleDisconnect(socket: Socket) {
-    const token = fastifyCookie.parse(
-      socket.client.request.headers.cookie,
-    ).auth_token;
-    const user = await this.userModel.findOne({ accessToken: token }).exec();
-    if (!user) {
-      socket.disconnect(true);
-      return;
-    }
-
-    this.gameService.memberSubject.next({
-      event: 'disconnected',
-      user,
-    });
+    this.memberService.removeMember(socket.id);
   }
 }

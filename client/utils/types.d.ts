@@ -15,19 +15,20 @@ export type UserType = {
   email: string;
 };
 
-export type EventType = {
-  name: 'faster_user' | 'fastest_user';
-  data: {
-    user: UserType;
-    value: number;
-    duration: number;
-  };
-  timestamp: number;
-} | {
-  name: 'completed';
-  data: {
-    type: 'first_row' | 'second_row' | 'third_row' | 'full_card';
-    user: UserType;
-    completed: boolean;
-  };
-};
+export type EventType = { _id: string } & (
+  {
+    name: 'faster_user' | 'fastest_user';
+    data: {
+      user: UserType;
+      value: number;
+      duration: number;
+    };
+    timestamp: number;
+  } | {
+  name: 'first_row' | 'second_row' | 'third_row' | 'full_card';
+    data: {
+      user: UserType;
+      completed: boolean;
+    };
+  }
+);

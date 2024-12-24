@@ -8,6 +8,7 @@ import { Choice } from '../schemas/choice.schema';
 import { Event } from '../schemas/event.schema';
 import { EventService } from '../game/event.service';
 import { User } from '../schemas/user.schema';
+import { MemberService } from '../game/member.service';
 
 @Injectable()
 export class AdminService {
@@ -18,6 +19,7 @@ export class AdminService {
     @InjectModel(Choice.name) private choiceModel: Model<Choice>,
     private readonly gameService: GameService,
     private readonly eventService: EventService,
+    private readonly memberService: MemberService,
   ) {}
 
   async updateState(value: string) {
@@ -34,7 +36,7 @@ export class AdminService {
   }
 
   getMembers() {
-    return User.value([...this.gameService.members.values()]);
+    return User.value(this.memberService.getMembers());
   }
 
   async getUserBoard(userId: number) {

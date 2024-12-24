@@ -15,6 +15,7 @@ import { Value } from '../schemas/value.schema';
 import { Choice } from '../schemas/choice.schema';
 import { PartialUser, User } from '../schemas/user.schema';
 import { EventService } from './event.service';
+import {MemberService} from "./member.service";
 
 @Injectable()
 export class GameService implements OnModuleInit {
@@ -24,13 +25,6 @@ export class GameService implements OnModuleInit {
 
   fastestUser = new Subject<PartialUser>();
 
-  memberSubject = new Subject<{
-    event: 'connected' | 'disconnected';
-    user: User;
-  }>();
-
-  members = new Map<number, User>();
-
   constructor(
     @InjectModel(Setting.name) private settingModel: Model<Setting>,
     @InjectModel(User.name) private userModel: Model<User>,
@@ -39,6 +33,7 @@ export class GameService implements OnModuleInit {
     @InjectModel(Choice.name) private choiceModel: Model<Choice>,
     private readonly boardService: BoardService,
     private readonly eventService: EventService,
+    private readonly memberService: MemberService,
   ) {}
 
   async onModuleInit() {
@@ -54,11 +49,6 @@ export class GameService implements OnModuleInit {
       )
       .exec();
     this.gameState.next(state.value);
-
-    this.memberSubject.subscribe((value) => {
-      if (value.event === 'disconnected') this.members.delete(value.user.id);
-      else this.members.set(value.user.id, value.user);
-    });
 
     this.gameState.subscribe((value) => {
       if (value === 'results') this.eventService.checkFastestUser();

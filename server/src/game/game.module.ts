@@ -12,6 +12,7 @@ import { Choice, ChoiceSchema } from '../schemas/choice.schema';
 import { User, UserSchema } from '../schemas/user.schema';
 import { Event, EventSchema } from '../schemas/event.schema';
 import { EventService } from './event.service';
+import { MemberService } from './member.service';
 
 @Module({
   imports: [
@@ -25,8 +26,14 @@ import { EventService } from './event.service';
     ]),
     AuthModule,
   ],
-  providers: [GameService, GameGateway, BoardService, EventService],
+  providers: [
+    GameService,
+    GameGateway,
+    BoardService,
+    EventService,
+    MemberService,
+  ],
   controllers: [GameController],
-  exports: [GameService, EventService],
+  exports: [GameService, EventService, MemberService],
 })
 export class GameModule {}
