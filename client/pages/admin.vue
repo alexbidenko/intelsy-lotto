@@ -114,6 +114,7 @@ onMounted(() => {
         <SwiperSlide
           v-for="(item, index) in adminStore.winners"
           :key="item._id"
+          class="!w-fit"
           :class="{ 'mr-3': index !== adminStore.winners.length - 1 }"
         >
 

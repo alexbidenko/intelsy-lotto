@@ -50,10 +50,10 @@ export class EventService {
       if (
         EVENT_TYPES.includes(event.name) &&
         event.data.completed &&
-        !excludedUsers.has(event.name)
-      ) {
+        !excludedUsers.has(event.name) &&
+        ![...excludedUsers.values()].includes(event.data.user.id)
+      )
         excludedUsers.set(event.name, event.data.user.id);
-      }
     });
 
     const pipeline: PipelineStage[] = [
@@ -159,11 +159,10 @@ export class EventService {
       }),
       (async () => {
         if (
-          board.data.every(
-            (row) =>
-              row.includes(value) &&
-              row.every((item) => !item || values.includes(item)),
-          )
+          board.data.every((row) =>
+            row.every((item) => !item || values.includes(item)),
+          ) &&
+          board.data.some((row) => row.includes(value))
         ) {
           const user = await this.userModel
             .findOne({ id: board.userId })

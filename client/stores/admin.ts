@@ -10,19 +10,19 @@ export const useAdminStore = defineStore('admin', () => {
   const members = reactive(new Map<number, UserType>());
   const events = ref<EventType[]>([]);
 
-  const winners = computed(() => [
-    ...events.value.reduceRight((acc, el) => {
+  const winners = computed(() => (
+    events.value.reduceRight<EventType[]>((acc, el) => {
       if (
         (
           (EVENT_TYPES.includes(el.name) && el.data.completed) ||
           el.name === 'fastest_user'
         ) &&
-        !acc.has(el.name)
-      ) acc.set(el.name, el);
+        !acc.some((e) => e.name === el.name || e.data.user.id === el.data.user.id)
+      ) acc.unshift(el);
 
       return acc;
-    }, new Map<string, EventType>()).values(),
-  ]);
+    }, [])
+  ));
 
   const loadMembers = () => {
     AdminAPI.members().then((data) => {
