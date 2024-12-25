@@ -42,7 +42,14 @@ watch(() => gameStore.fastestUser, () => {
 <template>
   <main v-auto-animate class="flex items-center justify-center flex-1 p-3 sm:p-6 md:p-8">
     <div v-if="gameStore.board" class="relative flex items-center justify-center h-full w-full p-3 sm:p-6 md:p-8">
-      <NuxtImg :src="background" format="webp" class="absolute h-full w-full rounded-2xl object-cover" />
+      <NuxtImg
+        :src="background"
+        width="2220"
+        height="1229"
+        sizes="xs:100vw sm:100vw md:100vw lg:100vw xl:100vw xxl:100vw"
+        format="webp"
+        class="absolute h-full w-full rounded-2xl object-cover"
+      />
       <Board :board="gameStore.board" :choices="gameStore.choices" class="shadow-2xl container" />
     </div>
     <div v-else class="h-full w-full bg-surface-100 flex flex-col items-center justify-center rounded-2xl">
