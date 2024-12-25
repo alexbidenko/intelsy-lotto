@@ -56,13 +56,22 @@ export default defineNuxtConfig({
       from: '@/theme.ts',
     },
   },
-  image:
-    process.env.NODE_ENV === 'development'
-      ? {
-        alias: { '_nuxt/assets': 'http://localhost:3001/_nuxt/assets' },
-        domains: ['http://localhost:3001'],
-      }
-      : { ipx: { maxAge: 31536000 } },
+  image: {
+    providers: {
+      ipx: {
+        name: 'ipx',
+        provider: '~/image-provider.ts',
+      },
+    },
+    ...(
+      process.env.NODE_ENV === 'development'
+        ? {
+          alias: { '_nuxt/assets': 'http://localhost:3001/_nuxt/assets' },
+          domains: ['http://localhost:3001'],
+        }
+        : { ipx: { maxAge: 31536000 } }
+    ),
+  },
   hooks: {
     'prerender:routes' ({ routes }) {
       routes.clear();
