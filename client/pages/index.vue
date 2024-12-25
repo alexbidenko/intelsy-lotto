@@ -46,7 +46,7 @@ watch(() => gameStore.fastestUser, () => {
         :src="background"
         width="2220"
         height="1229"
-        sizes="xs:100vw sm:100vw md:100vw lg:100vw xl:100vw xxl:100vw"
+        sizes="xs:200vw sm:200vw md:150vw lg:100vw xl:100vw xxl:100vw"
         format="webp"
         class="absolute h-full w-full rounded-2xl object-cover"
       />
