@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ssr: false,
   app: {
     rootAttrs: {
-      class: "h-full flex flex-col",
+      class: "min-h-full flex flex-col flex-1",
     },
   },
   runtimeConfig: {

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import logo from '~/assets/images/logo.svg';
+// import logoIntelsy from '~/assets/images/logo_intelsy.svg';
+import logoMst from '~/assets/images/logo_mst.png';
 
 const gameStore = useGameStore();
 const userStore = useUserStore();
@@ -9,7 +10,7 @@ const route = useRoute();
 <template>
   <header class="h-20 flex items-center justify-between px-3 sm:px-6 md:px-8">
     <div class="flex items-center gap-3">
-      <NuxtImg :src="logo" class="h-12" />
+      <NuxtImg :src="logoMst" class="h-12" />
       <Tag v-if="route.path === '/admin'" :value="gameStore.gameState" class="uppercase" />
     </div>
 

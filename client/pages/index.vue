@@ -30,6 +30,7 @@ const toast = useToast();
 const gameStore = useGameStore();
 
 watch(() => gameStore.fastestUser, () => {
+  toast.removeAllGroups();
   toast.add({
     severity: 'success',
     summary: FASTEST_USER_REPLICAS[Math.floor(Math.random() * FASTEST_USER_REPLICAS.length)],

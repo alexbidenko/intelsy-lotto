@@ -19,7 +19,7 @@ await useAsyncData(() => Promise.all([
     <Meta name="apple-mobile-web-app-title" content="Intelsy Lotto" />
     <Link rel="manifest" href="/site.webmanifest" />
   </Head>
-  <Body class="h-full bg-white" />
+  <Body class="h-full flex flex-col bg-white" />
 
   <NuxtRouteAnnouncer />
 
